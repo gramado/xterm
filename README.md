@@ -11,8 +11,10 @@ It's a fork of this code - https://github.com/joejulian/xterm
 
 Just type:
 
-$./configure
+$ ./configure
 
-$./xterm
+$ make
+
+$ ./xterm
 
 

@@ -182,9 +182,11 @@ scrnHeadAddr(TScreen * screen, ScrnBuf base, unsigned offset)
     return result;
 }
 
+
 /*
  * Given a block of data, build index to it in the 'base' parameter.
  */
+
 void
 setupLineData(TScreen * screen, ScrnBuf base, Char * data, unsigned nrow, unsigned ncol)
 {
@@ -707,26 +709,31 @@ ChangeToWide(XtermWidget xw)
 }
 #endif
 
+
 /*
  * Clear cells, no side-effects.
  */
-void
-CopyCells(TScreen * screen, LineData * src, LineData * dst, int col, int len)
-{
-    if (len > 0) {
-	int n;
-	int last = col + len;
 
-	for (n = col; n < last; ++n) {
-	    dst->charData[n] = src->charData[n];
-	    dst->attribs[n] = src->attribs[n];
-	}
+void
+CopyCells ( TScreen *screen, LineData *src, LineData *dst, int col, int len )
+{
+    if (len > 0) 
+	{
+	    int n;
+	    int last = col + len;
+
+	    for (n = col; n < last; ++n) 
+		{
+	        dst->charData[n] = src->charData[n];
+	        dst->attribs[n] = src->attribs[n];
+	    }
 
 	if_OPT_ISO_COLORS(screen, {
 	    for (n = col; n < last; ++n) {
 		dst->color[n] = src->color[n];
 	    }
 	});
+		
 	if_OPT_WIDE_CHARS(screen, {
 	    size_t off;
 	    for (n = col; n < last; ++n) {
@@ -735,28 +742,32 @@ CopyCells(TScreen * screen, LineData * src, LineData * dst, int col, int len)
 		}
 	    }
 	});
+		
     }
 }
+
 
 /*
  * Clear cells, no side-effects.
  */
+
 void
-ClearCells(XtermWidget xw, int flags, unsigned len, int row, int col)
+ClearCells ( XtermWidget xw, int flags, unsigned len, int row, int col )
 {
-    if (len != 0) {
-	TScreen *screen = TScreenOf(xw);
-	LineData *ld;
-	unsigned n;
+    if (len != 0) 
+	{
+	    TScreen *screen = TScreenOf(xw);
+	    LineData *ld;
+	    unsigned n;
 
-	ld = getLineData(screen, row);
+	    ld = getLineData(screen, row);
 
-	flags = (int) ((unsigned) flags | TERM_COLOR_FLAGS(xw));
+	    flags = (int) ((unsigned) flags | TERM_COLOR_FLAGS(xw));
 
-	for (n = 0; n < len; ++n)
-	    ld->charData[(unsigned) col + n] = (CharData) ' ';
+	    for (n = 0; n < len; ++n)
+	        ld->charData[(unsigned) col + n] = (CharData) ' ';
 
-	memset(ld->attribs + col, flags, (size_t) len);
+	    memset(ld->attribs + col, flags, (size_t) len);
 
 	if_OPT_ISO_COLORS(screen, {
 	    CellColor p = xtermColorPair(xw);
@@ -764,19 +775,23 @@ ClearCells(XtermWidget xw, int flags, unsigned len, int row, int col)
 		ld->color[(unsigned) col + n] = p;
 	    }
 	});
+		
 	if_OPT_WIDE_CHARS(screen, {
 	    size_t off;
 	    for_each_combData(off, ld) {
 		memset(ld->combData[off] + col, 0, (size_t) len * sizeof(CharData));
 	    }
 	});
+		
     }
 }
+
 
 /*
  * Clear data in the screen-structure (no I/O).
  * Check for wide-character damage as well, clearing the damaged cells.
  */
+
 void
 ScrnClearCells(XtermWidget xw, int row, int col, unsigned len)
 {
@@ -797,6 +812,7 @@ ScrnClearCells(XtermWidget xw, int row, int col, unsigned len)
     ClearCells(xw, flags, len, row, col);
 }
 
+
 /*
  * Disown the selection and repaint the area that is highlighted so it is no
  * longer highlighted.
@@ -813,42 +829,53 @@ ScrnDisownSelection(XtermWidget xw)
     }
 }
 
+
 /*
  * Writes str into buf at screen's current row and column.  Characters are set
  * to match flags.
  */
+
 void
-ScrnWriteText(XtermWidget xw,
-	      IChar * str,
-	      unsigned flags,
-	      unsigned cur_fg_bg,
-	      unsigned length)
+ScrnWriteText ( XtermWidget xw,
+	            IChar *str,
+	            unsigned flags,
+	            unsigned cur_fg_bg,
+	            unsigned length)
 {
     TScreen *screen = TScreenOf(xw);
-    LineData *ld;
-    Char *attrs;
-    int avail = MaxCols(screen) - screen->cur_col;
-    IChar *chars;
+    
+	LineData *ld;
+    
+	Char *attrs;
+    
+	int avail = MaxCols(screen) - screen->cur_col;
+    
+	IChar *chars;
+	
 #if OPT_WIDE_CHARS
     IChar starcol1;
 #endif
+	
     unsigned n;
-    unsigned real_width = visual_width(str, length);
+    unsigned real_width = visual_width ( str, length );
 
     (void) cur_fg_bg;
 
-    if (real_width + (unsigned) screen->cur_col > (unsigned) MaxCols(screen)) {
-	real_width = (unsigned) (MaxCols(screen) - screen->cur_col);
+    if (real_width + (unsigned) screen->cur_col > (unsigned) MaxCols(screen)) 
+	{
+	    real_width = (unsigned) (MaxCols(screen) - screen->cur_col);
     }
 
     if (avail <= 0)
-	return;
+	   return;
+	
     if (length > (unsigned) avail)
-	length = (unsigned) avail;
+	   length = (unsigned) avail;
+	
     if (length == 0 || real_width == 0)
-	return;
+	    return;
 
-    ld = getLineData(screen, screen->cur_row);
+    ld = getLineData ( screen, screen->cur_row );
 
     chars = ld->charData + screen->cur_col;
     attrs = ld->attribs + screen->cur_col;
@@ -858,16 +885,20 @@ ScrnWriteText(XtermWidget xw,
 #endif
 
     /* write blanks if we're writing invisible text */
-    for (n = 0; n < length; ++n) {
-	if ((flags & INVISIBLE))
-	    chars[n] = ' ';
-	else
-	    chars[n] = str[n];
+	
+    for (n = 0; n < length; ++n) 
+	{
+	    if ((flags & INVISIBLE))
+	        chars[n] = ' ';
+	    else
+	        chars[n] = str[n];
     }
 
+	
 #if OPT_BLINK_TEXT
-    if ((flags & BLINK) && !(screen->blink_as_bold)) {
-	LineSetBlinked(ld);
+    if ((flags & BLINK) && !(screen->blink_as_bold)) 
+	{
+	    LineSetBlinked(ld);
     }
 #endif
 
@@ -944,18 +975,22 @@ ScrnWriteText(XtermWidget xw,
     return;
 }
 
+
 /*
  * Saves pointers to the n lines beginning at sb + where, and clears the lines
  */
+
 static void
-ScrnClearLines(XtermWidget xw, ScrnBuf sb, int where, unsigned n, unsigned size)
+ScrnClearLines ( XtermWidget xw, ScrnBuf sb, int where, unsigned n, unsigned size )
 {
     TScreen *screen = TScreenOf(xw);
+	
     ScrnPtr *base;
     unsigned jump = scrnHeadSize(screen, 1);
     unsigned i;
     LineData *work;
     unsigned flags = TERM_COLOR_FLAGS(xw);
+	
 #if OPT_ISO_COLORS
     unsigned j;
 #endif
@@ -968,34 +1003,45 @@ ScrnClearLines(XtermWidget xw, ScrnBuf sb, int where, unsigned n, unsigned size)
     assert(size != 0);
 
     /* save n lines at where */
-    SaveLineData(sb, (unsigned) where, (size_t) n);
+    SaveLineData (sb, (unsigned) where, (size_t) n);
 
     /* clear contents of old rows */
+	
     base = screen->save_ptr;
-    for (i = 0; i < n; ++i) {
-	work = (LineData *) base;
-	work->bufHead = 0;
+	
+    for (i = 0; i < n; ++i) 
+	{
+	    work = (LineData *) base;
+	    work->bufHead = 0;
+		
 #if OPT_DEC_CHRSET
-	SetLineDblCS(work, 0);
+	    SetLineDblCS(work, 0);
 #endif
 
-	memset(work->charData, 0, size * sizeof(CharData));
-	if (TERM_COLOR_FLAGS(xw)) {
-	    memset(work->attribs, (int) flags, (size_t) size);
+	    memset(work->charData, 0, size * sizeof(CharData));
+	    
+		if (TERM_COLOR_FLAGS(xw)) 
+		{
+	        memset(work->attribs, (int) flags, (size_t) size);
 #if OPT_ISO_COLORS
-	    {
-		CellColor p = xtermColorPair(xw);
-		for (j = 0; j < size; ++j) {
-		    work->color[j] = p;
-		}
-	    }
+	        {
+		        CellColor p = xtermColorPair(xw);
+		        
+				for (j = 0; j < size; ++j) 
+				{
+		            work->color[j] = p;
+		        }
+	        }
 #endif
-	} else {
+	    } else {
+			
 	    memset(work->attribs, 0, (size_t) size);
 #if OPT_ISO_COLORS
 	    memset(work->color, 0, size * sizeof(work->color[0]));
 #endif
-	}
+			
+	    }
+		
 #if OPT_WIDE_CHARS
 	if (screen->wide_chars) {
 	    size_t off;
@@ -1005,7 +1051,8 @@ ScrnClearLines(XtermWidget xw, ScrnBuf sb, int where, unsigned n, unsigned size)
 	    }
 	}
 #endif
-	base = ScrnBufAddr(base, jump);
+		
+	    base = ScrnBufAddr(base, jump);
     }
 }
 
@@ -1081,9 +1128,12 @@ ScrnPointers(TScreen * screen, size_t len)
     return result;
 }
 
+
+
 /*
  * Inserts n blank lines at sb + where, treating last as a bottom margin.
  */
+
 void
 ScrnInsertLine(XtermWidget xw, ScrnBuf sb, int last, int where, unsigned n)
 {
@@ -1207,30 +1257,40 @@ ScrnDeleteLine(XtermWidget xw, ScrnBuf sb, int last, int where, unsigned n)
     RestoreLineData(sb, (unsigned) last, n);
 }
 
+
+
 /*
  * Inserts n blanks in screen at current row, col.  Size is the size of each
  * row.
  */
+
 void
-ScrnInsertChar(XtermWidget xw, unsigned n)
+ScrnInsertChar ( XtermWidget xw, unsigned n )
 {
+	
 #define MemMove(data) \
     	for (j = last; j >= (col + (int) n); --j) \
 	    data[j] = data[j - (int) n]
 
     TScreen *screen = TScreenOf(xw);
-    int first = ScrnLeftMargin(xw);
-    int last = ScrnRightMargin(xw);
-    int row = screen->cur_row;
+	
+    int first = ScrnLeftMargin (xw);
+    int last = ScrnRightMargin (xw);
+    
+	int row = screen->cur_row;
     int col = screen->cur_col;
-    int j;
+    
+	int j;
     LineData *ld;
 
     if (col < first || col > last) {
-	TRACE(("ScrnInsertChar - col %d outside [%d..%d]\n", col, first, last));
-	return;
+		
+	    TRACE(("ScrnInsertChar - col %d outside [%d..%d]\n", col, first, last));
+	    return;
+		
     } else if (last <= (col + (int) n)) {
-	n = (unsigned) (last - col);
+		
+	    n = (unsigned) (last - col);
     }
 
     assert(screen->cur_col >= 0);
@@ -1251,28 +1311,34 @@ ScrnInsertChar(XtermWidget xw, unsigned n)
 	}
     });
 
-    if ((ld = getLineData(screen, row)) != 0) {
-	MemMove(ld->charData);
-	MemMove(ld->attribs);
+    if ((ld = getLineData(screen, row)) != 0) 
+	{
+	    MemMove (ld->charData);
+	    MemMove (ld->attribs);
 
 	if_OPT_ISO_COLORS(screen, {
 	    MemMove(ld->color);
 	});
+		
 	if_OPT_WIDE_CHARS(screen, {
 	    size_t off;
 	    for_each_combData(off, ld) {
 		MemMove(ld->combData[off]);
 	    }
 	});
+		
     }
-    ClearCells(xw, CHARDRAWN, n, row, col);
+	
+    ClearCells ( xw, CHARDRAWN, n, row, col);
 
 #undef MemMove
 }
 
+
 /*
  * Deletes n characters at current row, col.
  */
+
 void
 ScrnDeleteChar(XtermWidget xw, unsigned n)
 {
@@ -1729,26 +1795,30 @@ ScrnRefresh(XtermWidget xw,
     return;
 }
 
+
 /*
  * Call this wrapper to ScrnRefresh() when the data has changed.  If the
  * refresh region overlaps the selection, we will release the primary selection.
  */
+
 void
-ScrnUpdate(XtermWidget xw,
-	   int toprow,
-	   int leftcol,
-	   int nrows,
-	   int ncols,
-	   Bool force)		/* ... leading/trailing spaces */
+ScrnUpdate ( XtermWidget xw,
+	         int toprow,
+	         int leftcol,
+	         int nrows,
+	         int ncols,
+	         Bool force)		/* ... leading/trailing spaces */
 {
     TScreen *screen = TScreenOf(xw);
 
-    if (ScrnHaveSelection(screen)
-	&& (toprow <= screen->endH.row)
-	&& (toprow + nrows - 1 >= screen->startH.row)) {
-	ScrnDisownSelection(xw);
+    if (ScrnHaveSelection(screen)     && 
+		(toprow <= screen->endH.row)  && 
+		(toprow + nrows - 1 >= screen->startH.row)) 
+	{
+	    ScrnDisownSelection (xw);
     }
-    ScrnRefresh(xw, toprow, leftcol, nrows, ncols, force);
+	
+    ScrnRefresh (xw, toprow, leftcol, nrows, ncols, force);
 }
 
 /*
@@ -2207,30 +2277,38 @@ ScreenResize(XtermWidget xw,
     return (0);
 }
 
+
 /*
  * Return true if any character cell starting at [row,col], for len-cells is
  * nonnull.
  */
+
 Bool
-non_blank_line(TScreen * screen,
-	       int row,
-	       int col,
-	       int len)
+non_blank_line ( TScreen *screen,
+	             int row,
+	             int col,
+	             int len)
 {
     int i;
     Bool found = False;
-    LineData *ld = getLineData(screen, row);
+	
+    LineData *ld = getLineData (screen, row);
 
-    if (ld != 0) {
-	for (i = col; i < len; i++) {
-	    if (ld->charData[i]) {
-		found = True;
-		break;
+    if (ld != 0) 
+	{
+	    for (i = col; i < len; i++) 
+		{
+	        if ( ld->charData[i] ) 
+			{
+		        found = True;
+		        break;
+	        }
 	    }
-	}
     }
+	
     return found;
 }
+
 
 /*
  * Limit/map rectangle parameters.
