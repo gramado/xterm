@@ -119,11 +119,14 @@ printCursorLine(XtermWidget xw)
  * happens with a line that is entirely blank.  This function prints the
  * characters that xterm would allow as a selection (which may include blanks).
  */
+
 static void
-printLine(XtermWidget xw, int row, unsigned chr, PrinterFlags * p)
+printLine ( XtermWidget xw, int row, unsigned chr, PrinterFlags *p )
 {
-    TScreen *screen = TScreenOf(xw);
+    TScreen *screen = TScreenOf (xw);
+    
     int inx = ROW2INX(screen, row);
+    
     LineData *ld;
     Char attr = 0;
     unsigned ch;
@@ -137,38 +140,47 @@ printLine(XtermWidget xw, int row, unsigned chr, PrinterFlags * p)
     int cs = CSET_IN;
     int last_cs = CSET_IN;
 
-    ld = getLineData(screen, inx);
+    ld = getLineData ( screen, inx );
+    
     if (ld == 0)
-	return;
+	    return;
 
     TRACE(("printLine(row=%d/%d, top=%d:%d, chr=%d):%s\n",
 	   row, ROW2INX(screen, row), screen->topline, screen->max_row, chr,
 	   visibleIChars(ld->charData, (unsigned) last)));
 
-    while (last > 0) {
-	if ((ld->attribs[last - 1] & CHARDRAWN) == 0)
-	    last--;
-	else
-	    break;
+    
+    while (last > 0) 
+    {
+	    if ((ld->attribs[last - 1] & CHARDRAWN) == 0)
+	        last--;
+	    else
+	        break;
     }
-    if (last) {
-	if (p->print_attributes) {
-	    send_CharSet(xw, ld);
-	    send_SGR(xw, 0, NO_COLOR, NO_COLOR);
-	}
-	for (col = 0; col < last; col++) {
-	    ch = ld->charData[col];
+    
+    if (last) 
+    {
+	    if (p->print_attributes)
+        {
+	        send_CharSet (xw, ld);
+	        send_SGR (xw, 0, NO_COLOR, NO_COLOR);
+	    }
+        
+	    for (col = 0; col < last; col++) 
+        {
+	        ch = ld->charData[col];
 #if OPT_PRINT_COLORS
-	    if (screen->colorMode) {
-		if (p->print_attributes > 1) {
+	        if (screen->colorMode) 
+            {
+		        if (p->print_attributes > 1) {
 		    fg = (ld->attribs[col] & FG_COLOR)
 			? extract_fg(xw, ColorOf(ld, col), ld->attribs[col])
 			: NO_COLOR;
 		    bg = (ld->attribs[col] & BG_COLOR)
 			? extract_bg(xw, ColorOf(ld, col), ld->attribs[col])
 			: NO_COLOR;
-		}
-	    }
+		    }
+	        }
 #endif
 	    if ((((ld->attribs[col] & SGR_MASK) != attr)
 #if OPT_PRINT_COLORS
@@ -186,7 +198,7 @@ printLine(XtermWidget xw, int row, unsigned chr, PrinterFlags * p)
 	    }
 
 	    if (ch == 0)
-		ch = ' ';
+		    ch = ' ';
 
 #if OPT_WIDE_CHARS
 	    if (screen->utf8_mode)
@@ -209,11 +221,12 @@ printLine(XtermWidget xw, int row, unsigned chr, PrinterFlags * p)
 	     * corresponding charset information is not encoded
 	     * into the CSETS array.
 	     */
-	    charToPrinter(xw,
-			  ((cs == CSET_OUT)
-			   ? (ch == ANSI_DEL ? 0x5f : (ch + 0x5f))
+            
+	    charToPrinter ( xw, ((cs == CSET_OUT)
+	           ? (ch == ANSI_DEL ? 0x5f : (ch + 0x5f))
 			   : ch));
-	    if_OPT_WIDE_CHARS(screen, {
+            
+	    if_OPT_WIDE_CHARS ( screen, {
 		size_t off;
 		for_each_combData(off, ld) {
 		    ch = ld->combData[off][col];
@@ -231,16 +244,18 @@ printLine(XtermWidget xw, int row, unsigned chr, PrinterFlags * p)
     }
 
     /* finish line (protocol for attributes needs a CR */
+    
     if (p->print_attributes)
-	charToPrinter(xw, '\r');
+	    charToPrinter ( xw, '\r');
 
-    if (chr && !(p->printer_newline)) {
-	if (LineTstWrapped(ld))
-	    chr = '\0';
+    if (chr && !(p->printer_newline)) 
+    {
+	    if ( LineTstWrapped(ld) )
+	        chr = '\0';
     }
 
     if (chr)
-	charToPrinter(xw, chr);
+	    charToPrinter ( xw, chr );
 
     return;
 }
@@ -248,35 +263,43 @@ printLine(XtermWidget xw, int row, unsigned chr, PrinterFlags * p)
 #define PrintNewLine() (unsigned) (((top < bot) || p->printer_newline) ? '\n' : '\0')
 
 static void
-printLines(XtermWidget xw, int top, int bot, PrinterFlags * p)
+printLines ( XtermWidget xw, int top, int bot, PrinterFlags *p )
 {
-    TRACE(("printLines, rows %d..%d\n", top, bot));
-    while (top <= bot) {
-	printLine(xw, top, PrintNewLine(), p);
-	++top;
+    TRACE (("printLines, rows %d..%d\n", top, bot));
+    
+    while (top <= bot) 
+    {
+	    printLine ( xw, top, PrintNewLine(), p );
+	    ++top;
     }
 }
 
-void
-xtermPrintScreen(XtermWidget xw, Bool use_DECPEX, PrinterFlags * p)
-{
-    if (XtIsRealized((Widget) xw)) {
-	TScreen *screen = TScreenOf(xw);
-	Bool extent = (use_DECPEX && p->printer_extent);
-	Boolean was_open = SPS.isOpen;
 
-	printLines(xw,
+void
+xtermPrintScreen ( XtermWidget xw, Bool use_DECPEX, PrinterFlags *p )
+{
+    if (XtIsRealized((Widget) xw)) 
+    {
+	    TScreen *screen = TScreenOf (xw);
+        
+	    Bool extent = (use_DECPEX && p->printer_extent);
+	    Boolean was_open = SPS.isOpen;
+
+	    printLines ( xw,
 		   extent ? 0 : screen->top_marg,
 		   extent ? screen->max_row : screen->bot_marg,
-		   p);
-	if (p->printer_formfeed)
-	    charToPrinter(xw, '\f');
+		   p );
+        
+	   if (p->printer_formfeed)
+	       charToPrinter(xw, '\f');
 
-	if (!was_open || SPS.printer_autoclose) {
-	    closePrinter(xw);
-	}
+	   if (!was_open || SPS.printer_autoclose) 
+       {
+	       closePrinter(xw);
+	   }
+        
     } else {
-	Bell(xw, XkbBI_MinorError, 0);
+	    Bell (xw, XkbBI_MinorError, 0);
     }
 }
 
@@ -337,6 +360,7 @@ xtermPrintEverything(XtermWidget xw, PrinterFlags * p)
 	closePrinter(xw);
     }
 }
+
 
 static void
 send_CharSet(XtermWidget xw, LineData * ld)
@@ -401,20 +425,26 @@ send_SGR(XtermWidget xw, unsigned attr, unsigned fg, unsigned bg)
     stringToPrinter(xw, msg);
 }
 
+
 /*
  * This implementation only knows how to write to a pipe.
  */
+
 static void
-charToPrinter(XtermWidget xw, unsigned chr)
+charToPrinter ( XtermWidget xw, unsigned chr )
 {
     TScreen *screen = TScreenOf(xw);
 
-    if (!SPS.isOpen && xtermHasPrinter(xw)) {
-	switch (SPS.toFile) {
-	    /*
-	     * write to a pipe.
-	     */
-	case False:
+    if (!SPS.isOpen && xtermHasPrinter(xw)) 
+    {
+	
+        switch (SPS.toFile) 
+        {
+	    
+                /*
+	             * write to a pipe.
+	             */
+	           case False:
 #ifdef VMS
 	    /*
 	     * This implementation only knows how to write to a file.  When the
@@ -476,12 +506,13 @@ charToPrinter(XtermWidget xw, unsigned chr)
 	    }
 #endif
 	    break;
-	case True:
-	    TRACE(("opening \"%s\" as printer output\n", SPS.printer_command));
-	    SPS.fp = fopen(SPS.printer_command, "w");
-	    break;
+                
+	    case True:
+	        TRACE(("opening \"%s\" as printer output\n", SPS.printer_command));
+	        SPS.fp = fopen ( SPS.printer_command, "w" );
+	        break;
 	}
-	SPS.isOpen = True;
+	    SPS.isOpen = True;
     }
     if (SPS.fp != 0) {
 #if OPT_WIDE_CHARS
@@ -491,18 +522,20 @@ charToPrinter(XtermWidget xw, unsigned chr)
 	    fputs((char *) temp, SPS.fp);
 	} else
 #endif
-	    fputc((int) chr, SPS.fp);
+	    fputc ( (int) chr, SPS.fp );
 	if (isForm(chr))
 	    fflush(SPS.fp);
     }
 }
 
+
 static void
-stringToPrinter(XtermWidget xw, const char *str)
+stringToPrinter ( XtermWidget xw, const char *str )
 {
     while (*str)
-	charToPrinter(xw, CharOf(*str++));
+	    charToPrinter ( xw, CharOf(*str++) );
 }
+
 
 /*
  * This module implements the MC (Media Copy) and related printing control
@@ -644,6 +677,7 @@ xtermPrinterControl(XtermWidget xw, int chr)
     }
 }
 
+
 /*
  * If there is no printer command, we will ignore printer controls.
  *
@@ -651,6 +685,7 @@ xtermPrinterControl(XtermWidget xw, int chr)
  * (perhaps) work if we pass it to popen().  At a minimum, the program
  * must exist and be executable.  If not, warn and disable the feature.
  */
+
 Bool
 xtermHasPrinter(XtermWidget xw)
 {

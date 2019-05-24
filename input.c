@@ -143,10 +143,10 @@ static void sunfuncvalue(ANSI *, KEY_DATA *);
 static void hpfuncvalue(ANSI *, KEY_DATA *);
 static void scofuncvalue(ANSI *, KEY_DATA *);
 
-static void
-AdjustAfterInput(XtermWidget xw)
-{
-    TScreen *screen = TScreenOf(xw);
+
+static void AdjustAfterInput (XtermWidget xw){
+	
+    TScreen *screen = TScreenOf (xw);
 
     if (screen->scrollkey && screen->topline != 0)
 	WindowScroll(xw, 0, False);
@@ -187,77 +187,92 @@ AdjustAfterInput(XtermWidget xw)
  *      | Delete | End    | PageDn |
  *      +--------+--------+--------+
  */
-static Bool
-IsEditKeypad(XtermWidget xw, KeySym keysym)
-{
+
+static Bool IsEditKeypad ( XtermWidget xw, KeySym keysym ){
+	
     Bool result;
 
-    switch (keysym) {
-    case XK_Delete:
-	result = !xtermDeleteIsDEL(xw);
-	break;
-    case XK_Prior:
-    case XK_Next:
-    case XK_Insert:
-    case XK_Find:
-    case XK_Select:
+    switch (keysym)
+	{
+        case XK_Delete:
+	        result = !xtermDeleteIsDEL(xw);
+	        break;
+			
+        case XK_Prior:
+        case XK_Next:
+        case XK_Insert:
+        case XK_Find:
+        case XK_Select:
 #ifdef DXK_Remove
-    case DXK_Remove:
+        case DXK_Remove:
 #endif
-	result = True;
-	break;
-    default:
-	result = False;
-	break;
+	        result = True;
+	        break;
+			
+        default:
+	        result = False;
+	        break;
     }
+	
     return result;
 }
+
 
 /*
  * Editing-keypad, plus other editing keys which are not included in the
  * other macros.
  */
+
 static Bool
-IsEditFunctionKey(XtermWidget xw, KeySym keysym)
+IsEditFunctionKey ( XtermWidget xw, KeySym keysym )
 {
     Bool result;
 
-    switch (keysym) {
+    switch (keysym)
+	{
+			
 #ifdef XK_KP_Delete
-    case XK_KP_Delete:		/* editing key on numeric keypad */
-    case XK_KP_Insert:		/* editing key on numeric keypad */
+        case XK_KP_Delete:		/* editing key on numeric keypad */
+        case XK_KP_Insert:		/* editing key on numeric keypad */
 #endif
 #ifdef XK_ISO_Left_Tab
-    case XK_ISO_Left_Tab:
+        case XK_ISO_Left_Tab:
 #endif
-	result = True;
-	break;
-    default:
-	result = IsEditKeypad(xw, keysym);
-	break;
+	        result = True;
+	        break;
+			
+        default:
+	        result = IsEditKeypad ( xw, keysym );
+	        break;
     }
+	
     return result;
 }
 
+
 #if OPT_MOD_FKEYS
 #define IS_CTRL(n) ((n) < ANSI_SPA || ((n) >= 0x7f && (n) <= 0x9f))
+
 
 /*
  * Return true if the keysym corresponds to one of the control characters,
  * or one of the common ASCII characters that is combined with control to
  * make a control character.
  */
-static Bool
-IsControlInput(KEY_DATA * kd)
-{
-    return ((kd->keysym) >= 0x40 && (kd->keysym) <= 0x7f);
-}
 
 static Bool
-IsControlOutput(KEY_DATA * kd)
+IsControlInput ( KEY_DATA *kd )
+{
+    return ( (kd->keysym) >= 0x40 && (kd->keysym) <= 0x7f );
+}
+
+
+static Bool
+IsControlOutput ( KEY_DATA *kd )
 {
     return IS_CTRL(kd->keysym);
 }
+
 
 /*
  * X "normally" has some built-in translations, which the user may want to
@@ -290,6 +305,7 @@ IsControlOutput(KEY_DATA * kd)
  * control ]   0x1d GS
  * control ?   0x7f DEL
  */
+
 static Bool
 IsControlAlias(KEY_DATA * kd)
 {
@@ -374,10 +390,12 @@ allowModifierParm(XtermWidget xw, KEY_DATA * kd)
 *       Meta+Ctrl+Alt+Shift  16 = 1(None)+8(Meta)+1(Shift)+2(Alt)+4(Ctrl)
 */
 
+
 unsigned
-xtermParamToState(XtermWidget xw, unsigned param)
+xtermParamToState ( XtermWidget xw, unsigned param )
 {
     unsigned result = 0;
+	
 #if OPT_NUM_LOCK
     if (param > MOD_NONE) {
 	if ((param - MOD_NONE) & MOD_SHIFT)
@@ -878,10 +896,15 @@ lookupKeyData(KEY_DATA * kd, XtermWidget xw, XKeyEvent * event)
     return result;
 }
 
+
+//
+// Input
+//
+
 void
-Input(XtermWidget xw,
-      XKeyEvent * event,
-      Bool eightbit)
+Input ( XtermWidget xw,
+        XKeyEvent *event,
+        Bool eightbit )
 {
     Char *string;
 
@@ -899,14 +922,15 @@ Input(XtermWidget xw,
     KEY_DATA kd;
 
     /* Ignore characters typed at the keyboard */
+	
     if (keyboard->flags & MODE_KAM)
-	return;
+	    return;
 
-    lookupKeyData(&kd, xw, event);
+    lookupKeyData ( &kd, xw, event );
 
-    memset(&reply, 0, sizeof(reply));
+    memset ( &reply, 0, sizeof(reply) );
 
-    TRACE(("Input keysym "
+    TRACE( ("Input keysym "
 	   KEYSYM_FMT
 	   ", %d:'%s'%s" FMT_MODIFIER_NAMES "%s%s%s%s%s%s\n",
 	   kd.keysym,
@@ -922,7 +946,7 @@ Input(XtermWidget xw,
 	   IsPFKey(kd.keysym) ? " PFKey" : "",
 	   kd.is_fkey ? " FKey" : "",
 	   IsMiscFunctionKey(kd.keysym) ? " MiscFKey" : "",
-	   IsEditFunctionKey(xw, kd.keysym) ? " EditFkey" : ""));
+	   IsEditFunctionKey(xw, kd.keysym) ? " EditFkey" : "") );
 
 #if OPT_SUNPC_KBD
     /*
@@ -1094,29 +1118,37 @@ Input(XtermWidget xw,
 #endif /* OPT_MOD_FKEYS */
     }
 
+	
+	
     /*
      * Test for one of the keyboard variants.
      */
-    switch (keyboard->type) {
-    case keyboardIsHP:
-	hpfuncvalue(&reply, &kd);
-	break;
-    case keyboardIsSCO:
-	scofuncvalue(&reply, &kd);
-	break;
-    case keyboardIsSun:
-	sunfuncvalue(&reply, &kd);
-	break;
-    case keyboardIsTermcap:
+	
+    switch (keyboard->type) 
+	{
+        case keyboardIsHP:
+	        hpfuncvalue (&reply, &kd);
+	        break;
+			
+        case keyboardIsSCO:
+	        scofuncvalue (&reply, &kd);
+	        break;
+			
+        case keyboardIsSun:
+	        sunfuncvalue (&reply, &kd);
+	        break;
+			
+        case keyboardIsTermcap:
 #if OPT_TCAP_FKEYS
-	if (xtermcapString(xw, (int) kd.keysym, evt_state))
-	    return;
+	        if ( xtermcapString(xw, (int) kd.keysym, evt_state) )
+	            return;
 #endif
-	break;
-    case keyboardIsDefault:
-    case keyboardIsLegacy:
-    case keyboardIsVT220:
-	break;
+	        break;
+			
+        case keyboardIsDefault:
+        case keyboardIsLegacy:
+        case keyboardIsVT220:
+	        break;
     }
 
     if (reply.a_final) {
@@ -1364,28 +1396,31 @@ Input(XtermWidget xw,
 		    UIntClr(evt_state, ControlMask);
 		}
 	    }
+		
 	    if (prefix != 0)
 		unparseputc(xw, prefix);	/* escape */
 	    for (j = 0; j < kd.nbytes; ++j)
-		unparseputc(xw, CharOf(kd.strbuf[j]));
+		    unparseputc ( xw, CharOf(kd.strbuf[j]) );
 	}
-	key = ((kd.keysym != ANSI_XOFF) && (kd.keysym != ANSI_XON));
+	    key = ((kd.keysym != ANSI_XOFF) && (kd.keysym != ANSI_XON));
     }
     unparse_end(xw);
 
     if (key && !TEK4014_ACTIVE(xw))
-	AdjustAfterInput(xw);
+	    AdjustAfterInput(xw);
 
-    xtermShowPointer(xw, False);
-    return;
+    xtermShowPointer ( xw, False );
+    
+	return;
 }
 
 void
-StringInput(XtermWidget xw, const Char * string, size_t nbytes)
+StringInput ( XtermWidget xw, const Char *string, size_t nbytes )
 {
     TRACE(("InputString (%s,%lu)\n",
 	   visibleChars(string, (unsigned) nbytes),
 	   (unsigned long) nbytes));
+	
 #if OPT_TEK4014
     if (nbytes && TEK4014_GIN(tekWidget)) {
 	TekEnqMouse(tekWidget, *string++);
@@ -1393,17 +1428,19 @@ StringInput(XtermWidget xw, const Char * string, size_t nbytes)
 	nbytes--;
     }
 #endif
+	
     while (nbytes-- != 0)
-	unparseputc(xw, *string++);
+	    unparseputc ( xw, *string++ );
     if (!TEK4014_ACTIVE(xw))
-	AdjustAfterInput(xw);
+	    AdjustAfterInput(xw);
     unparse_end(xw);
 }
 
+
 /* These definitions are DEC-style (e.g., vt320) */
-static int
-decfuncvalue(KEY_DATA * kd)
-{
+
+static int decfuncvalue (KEY_DATA * kd){
+	
     int result;
 
     if (kd->is_fkey) {
@@ -1718,78 +1755,100 @@ skipName(const char *s)
     return s;
 }
 
+
 /*
  * Found a ":" in a translation, check what is past it to see if it contains
  * any of the insert-text action names.
  */
-static Boolean
-keyCanInsert(const char *parse)
-{
+
+static Boolean keyCanInsert (const char *parse){
+	
     Boolean result = False;
     int ch;
     Boolean escape = False;
     Boolean quoted = False;
 
-    static const char *table[] =
-    {
-	"insert",
-	"insert-seven-bit",
-	"insert-eight-bit",
-	"string",
+    static const char *table[] = {
+	    "insert",
+	    "insert-seven-bit",
+	    "insert-eight-bit",
+	    "string",
     };
+	
     Cardinal n;
 
-    while (*parse != '\0' && *parse != '\n') {
-	ch = CharOf(*parse++);
-	if (escape) {
-	    escape = False;
-	} else if (ch == '\\') {
-	    escape = True;
-	} else if (ch == '"') {
-	    quoted = (Boolean) ! quoted;
-	} else if (!quoted && isName(ch)) {
-	    const char *next = skipName(--parse);
-	    size_t need = (size_t) (next - parse);
+    while (*parse != '\0' && *parse != '\n') 
+	{
+	    ch = CharOf (*parse++);
+		
+	    if (escape) {
+			
+	        escape = False;
+			
+	    } else if (ch == '\\') {
+			
+	        escape = True;
+			
+	    } else if (ch == '"') {
+			
+	        quoted = (Boolean) ! quoted;
+			
+	    } else if (!quoted && isName(ch)) {
+			
+	        const char *next = skipName (--parse);
+			
+	        size_t need = (size_t) (next - parse);
 
-	    for (n = 0; n < XtNumber(table); ++n) {
-		if (need == strlen(table[n])
-		    && !strncmp(parse, table[n], need)) {
-		    result = True;
-		    break;
-		}
+	        for ( n=0; n < XtNumber(table); ++n ) 
+			{
+		        if ( need == strlen(table[n]) && !strncmp(parse, table[n], need)) 
+				{
+		            result = True;
+		            break;
+		        }
+	        }
+	        
+			parse = next;
 	    }
-	    parse = next;
-	}
-
     }
+	
     return result;
 }
+
 
 /*
  * Strip the entire action, to avoid matching it.
  */
-static char *
-stripAction(char *base, char *last)
-{
-    while (last != base) {
-	if (*--last == '\n') {
-	    break;
-	}
+
+static char *stripAction (char *base, char *last){
+	
+    while (last != base) 
+	{
+	    if (*--last == '\n') 
+		{
+	        break;
+	    }
     }
+	
     return last;
 }
+
 
 static char *
 stripBlanks(char *base, char *last)
 {
-    while (last != base) {
-	int ch = CharOf(last[-1]);
-	if (ch != ' ' && ch != '\t')
-	    break;
-	--last;
+    while (last != base) 
+	{
+	    int ch = CharOf (last[-1]);
+	    
+		if (ch != ' ' && ch != '\t')
+	        break;
+	     --last;
     }
+	
     return last;
 }
+
 
 /*
  * Strip unneeded whitespace from a translations resource, mono-casing and

@@ -27,7 +27,7 @@ hostinfo               = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
-PATH = /usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
+PATH = /usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl
 
 ## ------------ ##
 ## Core tests.  ##
@@ -653,7 +653,7 @@ configure: In function 'main':
 configure:5609:2: warning: implicit declaration of function 'tgetent' [-Wimplicit-function-declaration]
   buffer[0] = 0;
   ^~~~~~~
-/usr/bin/ld: /tmp/cccmNCxG.o: in function `main':
+/usr/bin/ld: /tmp/ccZYBc7H.o: in function `main':
 /home/nora/src/xterm/configure:5609: undefined reference to `tgetent'
 collect2: error: ld returned 1 exit status
 configure:5617: $? = 1
@@ -922,7 +922,7 @@ configure:6860: $? = 0
 configure:6871: result: yes
 configure:6886: checking if external errno exists
 configure:6908: gcc -o conftest -g -O2  -D_GNU_SOURCE  conftest.c -lncurses  >&5
-/usr/bin/ld: errno: TLS definition in /usr/lib/libc.so.6 section .tbss mismatches non-TLS reference in /tmp/ccZ9Nr3n.o
+/usr/bin/ld: errno: TLS definition in /usr/lib/libc.so.6 section .tbss mismatches non-TLS reference in /tmp/ccZW9AL2.o
 /usr/bin/ld: /usr/lib/libc.so.6: error adding symbols: bad value
 collect2: error: ld returned 1 exit status
 configure:6911: $? = 1
@@ -971,7 +971,7 @@ configure:7258: $? = 0
 configure:7269: result: yes
 configure:7284: checking if external sys_nerr exists
 configure:7306: gcc -o conftest -g -O2  -D_GNU_SOURCE  conftest.c -lncurses  >&5
-/usr/bin/ld: /tmp/ccamUarp.o: in function `main':
+/usr/bin/ld: /tmp/ccw6g6JZ.o: in function `main':
 /home/nora/src/xterm/configure:7299: warning: `sys_nerr' is deprecated; use `strerror' or `strerror_r' instead
 configure:7309: $? = 0
 configure:7312: test -s conftest
@@ -989,7 +989,7 @@ configure:7373: $? = 0
 configure:7384: result: yes
 configure:7399: checking if external sys_errlist exists
 configure:7421: gcc -o conftest -g -O2  -D_GNU_SOURCE  conftest.c -lncurses  >&5
-/usr/bin/ld: /tmp/cclcXrCE.o: in function `main':
+/usr/bin/ld: /tmp/cc2WiQHa.o: in function `main':
 /home/nora/src/xterm/configure:7414: warning: `sys_errlist' is deprecated; use `strerror' or `strerror_r' instead
 configure:7424: $? = 0
 configure:7427: test -s conftest
@@ -1148,7 +1148,7 @@ configure:8931: testing package xt CFLAGS:  ...
 configure:8935: testing package xt LIBS: -lXt -lX11  ...
 configure:9189: checking for usable X Toolkit package
 configure:9211: gcc -o conftest -g -O2  -D_GNU_SOURCE  conftest.c -lXt -lX11  -lncurses  >&5
-/usr/bin/ld: /tmp/cc1QIX1a.o: undefined reference to symbol 'IceConnectionNumber'
+/usr/bin/ld: /tmp/ccTNwmyh.o: undefined reference to symbol 'IceConnectionNumber'
 /usr/bin/ld: /usr/lib/libICE.so.6: error adding symbols: DSO missing from command line
 collect2: error: ld returned 1 exit status
 configure:9214: $? = 1
@@ -1221,7 +1221,7 @@ configure:10116: testing package xaw7 CFLAGS:  ...
 configure:10120: testing package xaw7 LIBS: -lXaw7 -lXt -lX11  ...
 configure:10210: checking for usable Xaw/Xmu package
 configure:10233: gcc -o conftest -g -O2  -D_GNU_SOURCE  conftest.c -lXaw7 -lXt -lX11  -lXpm -lSM  -lICE  -lXt -lX11  -lncurses  >&5
-/usr/bin/ld: /tmp/ccl5dBRv.o: undefined reference to symbol 'XmuCompareISOLatin1'
+/usr/bin/ld: /tmp/ccZwk30Z.o: undefined reference to symbol 'XmuCompareISOLatin1'
 /usr/bin/ld: /usr/lib/libXmu.so.6: error adding symbols: DSO missing from command line
 collect2: error: ld returned 1 exit status
 configure:10236: $? = 1
@@ -1609,7 +1609,7 @@ configure:14928: $? = 0
 configure:14938: result: yes
 configure:14957: checking for usable Xft/fontconfig package
 configure:14983: gcc -o conftest -g -O2  -D_GNU_SOURCE  -DNARROWPROTO=1 -DFUNCPROTO=15 -DOSMAJORVERSION=5 -DOSMINORVERSION=0  -I/usr/include/freetype2 -I/usr/include/libpng16 -I/usr/include/harfbuzz -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include -I/usr/include/uuid  conftest.c  -lXft  -lXmu -lXt -lX11  -lXaw7 -lXt -lX11  -lXpm -lSM  -lICE  -lXt -lX11  -lncurses   >&5
-/usr/bin/ld: /tmp/ccc0kssz.o: undefined reference to symbol 'FcPatternBuild'
+/usr/bin/ld: /tmp/cca0pwif.o: undefined reference to symbol 'FcPatternBuild'
 /usr/bin/ld: /usr/lib/libfontconfig.so.1: error adding symbols: DSO missing from command line
 collect2: error: ld returned 1 exit status
 configure:14986: $? = 1
@@ -1799,6 +1799,7 @@ config.status:19214: creating Makefile
 config.status:19214: creating df-install
 config.status:19214: creating minstall
 config.status:19367: creating xtermcfg.h
+config.status:19509: xtermcfg.h is unchanged
 
 ## ----------------- ##
 ## Cache variables.  ##

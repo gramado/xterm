@@ -39,73 +39,81 @@
 
 #include "keysym2ucs.c"
 
+
 Atom
-_xa_utf8_string(Display * dpy)
+_xa_utf8_string (Display * dpy)
 {
     static AtomPtr p = NULL;
 
     if (p == NULL)
-	p = XmuMakeAtom("UTF8_STRING");
+	    p = XmuMakeAtom ("UTF8_STRING");
 
     return XmuInternAtom(dpy, p);
 }
+
 #define XA_UTF8_STRING(dpy) _xa_utf8_string(dpy)
 
+
 static int
-utf8countBytes(int c)
+utf8countBytes (int c)
 {
     if (c < 0)
-	return 0;
+	    return 0;
 
     if (c <= 0x7F) {
-	return 1;
+	    return 1;
     } else if (c <= 0x7FF) {
-	return 2;
+	      return 2;
     } else if (c <= 0xFFFF) {
-	return 3;
+	      return 3;
     } else
-	return 4;
+	      return 4;
 }
 
+
 static void
-utf8insert(char *dest, int c, size_t *len_return)
+utf8insert (char *dest, int c, size_t *len_return)
 {
     if (c < 0)
 	return;
 
     if (c <= 0x7F) {
-	dest[0] = (char) c;
-	*len_return = 1;
+	    dest[0] = (char) c;
+	    *len_return = 1;
     } else if (c <= 0x7FF) {
-	dest[0] = (char) (0xC0 | ((c >> 6) & 0x1F));
-	dest[1] = (char) (0x80 | (c & 0x3F));
-	*len_return = 2;
+	    dest[0] = (char) (0xC0 | ((c >> 6) & 0x1F));
+	    dest[1] = (char) (0x80 | (c & 0x3F));
+	    *len_return = 2;
     } else if (c <= 0xFFFF) {
-	dest[0] = (char) (0xE0 | ((c >> 12) & 0x0F));
-	dest[1] = (char) (0x80 | ((c >> 6) & 0x3F));
-	dest[2] = (char) (0x80 | (c & 0x3F));
-	*len_return = 3;
+	    dest[0] = (char) (0xE0 | ((c >> 12) & 0x0F));
+	    dest[1] = (char) (0x80 | ((c >> 6) & 0x3F));
+	    dest[2] = (char) (0x80 | (c & 0x3F));
+	    *len_return = 3;
     } else {
-	dest[0] = (char) (0xF0 | ((c >> 18) & 0x07));
-	dest[1] = (char) (0x80 | ((c >> 12) & 0x3f));
-	dest[2] = (char) (0x80 | ((c >> 6) & 0x3f));
-	dest[3] = (char) (0x80 | (c & 0x3f));
-	*len_return = 4;
+	    dest[0] = (char) (0xF0 | ((c >> 18) & 0x07));
+	    dest[1] = (char) (0x80 | ((c >> 12) & 0x3f));
+	    dest[2] = (char) (0x80 | ((c >> 6) & 0x3f));
+	    dest[3] = (char) (0x80 | (c & 0x3f));
+	    *len_return = 4;
     }
 }
+
 
 static int
 l1countUtf8Bytes(char *s, size_t len)
 {
     int l = 0;
+    
     while (len != 0) {
-	if ((*s & 0x80) == 0)
+        
+	if ( (*s & 0x80) == 0 )
 	    l++;
 	else
 	    l += 2;
 	s++;
 	len--;
     }
+    
     return l;
 }
 

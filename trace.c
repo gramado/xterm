@@ -72,9 +72,8 @@ const char *trace_who = "parent";
 
 static FILE *trace_fp;
 
-void
-Trace(const char *fmt,...)
-{
+void Trace (const char *fmt,...){
+	
     static const char *trace_out;
     va_list ap;
 

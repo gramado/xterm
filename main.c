@@ -85,7 +85,9 @@
  * hold your breath, though....
  */
 
+
 /* main.c */
+
 
 #define RES_OFFSET(field)	XtOffsetOf(XTERM_RESOURCE, field)
 
@@ -1278,23 +1280,25 @@ static OptionHelp xtermOptions[] = {
 { NULL, NULL }};
 /* *INDENT-ON* */
 
-static const char *message[] =
-{
+
+
+static const char *message[] = {
     "Fonts should be fixed width and, if both normal and bold are specified, should",
     "have the same size.  If only a normal font is specified, it will be used for",
     "both normal and bold text (by doing overstriking).  The -e option, if given,",
     "must appear at the end of the command line, otherwise the user's default shell",
     "will be started.  Options that start with a plus sign (+) restore the default.",
-    NULL};
+    NULL };
+
 
 /*
  * Decode a key-definition.  This combines the termcap and ttyModes, for
  * comparison.  Note that octal escapes in ttyModes are done by the normal
  * resource translation.  Also, ttyModes allows '^-' as a synonym for disabled.
  */
-static int
-decode_keyvalue(char **ptr, int termcap)
-{
+
+static int decode_keyvalue (char **ptr, int termcap){
+	
     char *string = *ptr;
     int value = -1;
 
@@ -1347,9 +1351,9 @@ decode_keyvalue(char **ptr, int termcap)
     return value;
 }
 
-static int
-matchArg(XrmOptionDescRec * table, const char *param)
-{
+
+static int matchArg (XrmOptionDescRec * table, const char *param){
+	
     int result = -1;
     int n;
     int ch;
@@ -1367,10 +1371,10 @@ matchArg(XrmOptionDescRec * table, const char *param)
     return result;
 }
 
+
 /* return the number of argv[] entries which constitute arguments of option */
-static int
-countArg(XrmOptionDescRec * item)
-{
+static int countArg (XrmOptionDescRec * item){
+	
     int result = 0;
 
     switch (item->argKind) {
@@ -1393,6 +1397,7 @@ countArg(XrmOptionDescRec * item)
 	result = (int) (long) (item->value);
 	break;
     }
+	
     return result;
 }
 
@@ -1406,6 +1411,7 @@ countArg(XrmOptionDescRec * item)
  * "-d" as an abbreviation for "-display".  Doing this requires checking the
  * standard table (something that the X libraries should do).
  */
+
 static XrmOptionDescRec *
 parseArg(int *num, char **argv, char **valuep)
 {
@@ -1554,9 +1560,9 @@ parseArg(int *num, char **argv, char **valuep)
     return result;
 }
 
-static void
-Syntax(char *badOption)
-{
+
+static void Syntax (char *badOption){
+	
     OptionHelp *opt;
     OptionHelp *list = sortedOpts(xtermOptions, optionDescList, XtNumber(optionDescList));
     int col;
@@ -1588,9 +1594,9 @@ Version(void)
     fflush(stdout);
 }
 
-static void
-Help(void)
-{
+
+static void Help (void){
+	
     OptionHelp *opt;
     OptionHelp *list = sortedOpts(xtermOptions, optionDescList, XtNumber(optionDescList));
     const char **cpp;
@@ -1668,14 +1674,15 @@ static XtActionsRec actionProcs[] =
     {"KeyboardMapping", KeyboardMapping},
 };
 
+
 /*
  * Some platforms use names such as /dev/tty01, others /dev/pts/1.  Parse off
  * the "tty01" or "pts/1" portion, and return that for use as an identifier for
  * utmp.
  */
-static char *
-my_pty_name(char *device)
-{
+
+static char *my_pty_name (char *device){
+	
     size_t len = strlen(device);
     Bool name = False;
 
@@ -1698,13 +1705,14 @@ my_pty_name(char *device)
     return device + len;
 }
 
+
 /*
  * If the name contains a '/', it is a "pts/1" case.  Otherwise, return the
  * last few characters for a utmp identifier.
  */
-static char *
-my_pty_id(char *device)
-{
+
+static char *my_pty_id (char *device){
+	
     char *name = my_pty_name(device);
     char *leaf = x_basename(name);
 
@@ -1924,9 +1932,10 @@ setEffectiveUser(uid_t user)
 #endif
 #endif /* HAVE_POSIX_SAVED_IDS */
 
-int
-main(int argc, char *argv[]ENVP_ARG)
-{
+
+
+int main ( int argc, char *argv[]ENVP_ARG ){
+	
 #if OPT_MAXIMIZE
 #define DATA(name) { #name, es##name }
     static FlagList tblFullscreen[] =
@@ -1951,8 +1960,8 @@ main(int argc, char *argv[]ENVP_ARG)
     save_egid = getegid();
 #endif
 
-    save_ruid = getuid();
-    save_rgid = getgid();
+    save_ruid = getuid ();
+    save_rgid = getgid ();
 
 #if defined(DISABLE_SETUID) || defined(DISABLE_SETGID)
 #if defined(DISABLE_SETUID)
@@ -1998,51 +2007,71 @@ main(int argc, char *argv[]ENVP_ARG)
 	int n;
 	Bool quit = False;
 
-	for (n = 1; n < argc; n++) {
+		
+	for (n = 1; n < argc; n++){
+		
 	    if ((option_ptr = parseArg(&n, argv, &option_value)) == 0) {
-		if (argv[n] == 0) {
-		    break;
-		} else if (isOption(argv[n])) {
-		    Syntax(argv[n]);
-		} else if (explicit_shname != 0) {
+		    if (argv[n] == 0) {
+		        break;
+		    } else if (isOption(argv[n])) {
+		        Syntax(argv[n]);
+		    } else if (explicit_shname != 0) {
 		    xtermWarning("Explicit shell already was %s\n", explicit_shname);
 		    Syntax(argv[n]);
-		}
-		explicit_shname = xtermFindShell(argv[n], True);
-		if (explicit_shname == 0)
-		    exit(0);
-		TRACE(("...explicit shell %s\n", explicit_shname));
+		    }
+		    
+			explicit_shname = xtermFindShell (argv[n], True);
+		    if (explicit_shname == 0)
+		        exit (0);
+		    TRACE(("...explicit shell %s\n", explicit_shname));
+			
 	    } else if (!strcmp(option_ptr->option, "-e")) {
-		command_to_exec = (argv + n + 1);
-		if (!command_to_exec[0])
-		    Syntax(argv[n]);
-		break;
+		    
+			command_to_exec = (argv + n + 1);
+		    
+			if (!command_to_exec[0])
+		        Syntax(argv[n]);
+		    break;
+			
 	    } else if (!strcmp(option_ptr->option, "-version")) {
-		Version();
-		quit = True;
-	    } else if (!strcmp(option_ptr->option, "-help")) {
-		Help();
-		quit = True;
-	    } else if (!strcmp(option_ptr->option, "-class")) {
-		if ((my_class = x_strdup(option_value)) == 0) {
-		    Help();
+		    
+			Version ();
 		    quit = True;
-		}
+			
+	    } else if (!strcmp(option_ptr->option, "-help")) {
+		    
+			Help ();
+		    quit = True;
+			
+	    } else if (!strcmp(option_ptr->option, "-class")) {
+		    
+			if ((my_class = x_strdup(option_value)) == 0) {
+		    
+			    Help ();
+		        quit = True;
+		    }
+			
 	    } else if (!strcmp(option_ptr->option, "-into")) {
-		char *endPtr;
-		winToEmbedInto = (Window) strtol(option_value, &endPtr, 0);
+		    
+			char *endPtr;
+		    winToEmbedInto = (Window) strtol (option_value, &endPtr, 0);
 	    }
 	}
+		
+		
 	if (quit)
-	    exit(0);
-	/*
+	    exit (0);
+		
+		
+	 /*
 	 * If there is anything left unparsed, and we're not using "-e",
 	 * then give up.
 	 */
 	if (n < argc && !command_to_exec) {
 	    Syntax(argv[n]);
 	}
-    }
+    
+	}
 
     /* This dumped core on HP-UX 9.05 with X11R5 */
 #if OPT_I18N_SUPPORT
@@ -2592,6 +2621,7 @@ main(int argc, char *argv[]ENVP_ARG)
 static int opened_tty = -1;
 #endif
 
+
 /*
  * This function opens up a pty master and stuffs its value into pty.
  *
@@ -2600,9 +2630,9 @@ static int opened_tty = -1;
  * so that if a pty master is found and later, we find that the slave
  * has problems, we can re-enter this function and get another one.
  */
-static int
-get_pty(int *pty, char *from GCC_UNUSED)
-{
+
+static int get_pty (int *pty, char *from GCC_UNUSED){
+	
     int result = 1;
 
 #if defined(HAVE_POSIX_OPENPT) && defined(HAVE_PTSNAME) && defined(HAVE_GRANTPT_PTY_ISATTY)
@@ -3144,14 +3174,16 @@ find_utmp(struct UTMP_STR *tofind)
 #define USE_NO_DEV_TTY 0
 #endif
 
+
+
 /*
  *  Inits pty and tty and forks a login process.
  *  Does not close fd Xsocket.
  *  If slave, the pty named in passedPty is already open for use
  */
-static int
-spawnXTerm(XtermWidget xw)
-{
+
+static int spawnXTerm (XtermWidget xw){
+	
     TScreen *screen = TScreenOf(xw);
     Cardinal nn;
 #if OPT_PTY_HANDSHAKE
@@ -4751,11 +4783,13 @@ spawnXTerm(XtermWidget xw)
     return 0;
 }				/* end spawnXTerm */
 
-void
-Exit(int n)
-{
+
+
+void Exit (int n){
+	
     XtermWidget xw = term;
-    TScreen *screen = TScreenOf(xw);
+    
+	TScreen *screen = TScreenOf(xw);
 
 #ifdef USE_UTEMPTER
     if (!resource.utmpInhibit && added_utmp_entry) {
@@ -5165,12 +5199,12 @@ GetBytesAvailable(int fd)
 }
 #endif /* !VMS */
 
+
 /* Utility function to try to hide system differences from
    everybody who used to call killpg() */
 
-int
-kill_process_group(int pid, int sig)
-{
+int kill_process_group (int pid, int sig){
+	
     TRACE(("kill_process_group(pid=%d, sig=%d)\n", pid, sig));
 #if defined(SVR4) || defined(SYSV) || !defined(X_NOT_POSIX)
     return kill(-pid, sig);
@@ -5209,10 +5243,9 @@ E2A(int x)
 struct _proc_session ps;
 struct _proc_session_reply rps;
 
-int
-qsetlogin(char *login, char *ttyname)
-{
-    int v = getsid(getpid());
+int qsetlogin (char *login, char *ttyname){
+	
+    int v = getsid ( getpid() );
 
     memset(&ps, 0, sizeof(ps));
     memset(&rps, 0, sizeof(rps));
@@ -5236,3 +5269,5 @@ qsetlogin(char *login, char *ttyname)
     return (rps.status);
 }
 #endif
+
+

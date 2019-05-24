@@ -135,14 +135,16 @@
 
 #if OPT_TRACE > 1
 static void
-traceScrnBuf(const char *tag, TScreen * screen, ScrnBuf sb, unsigned len)
+traceScrnBuf ( const char *tag, TScreen * screen, ScrnBuf sb, unsigned len)
 {
     unsigned j;
 
     TRACE(("traceScrnBuf %s\n", tag));
-    for (j = 0; j < len; ++j) {
-	LineData *src = (LineData *) scrnHeadAddr(screen, sb, j);
-	TRACE(("%p %s%3d:%s\n",
+	
+    for (j = 0; j < len; ++j) 
+	{
+	    LineData *src = (LineData *) scrnHeadAddr(screen, sb, j);
+	    TRACE(("%p %s%3d:%s\n",
 	       src, ((int) j >= screen->savelines) ? "*" : " ",
 	       j, visibleIChars(src->charData, src->lineSize)));
     }
@@ -155,15 +157,16 @@ traceScrnBuf(const char *tag, TScreen * screen, ScrnBuf sb, unsigned len)
 #endif
 
 static unsigned
-scrnHeadSize(TScreen * screen, unsigned count)
+scrnHeadSize ( TScreen *screen, unsigned count )
 {
     unsigned result = SizeOfLineData;
 
     (void) screen;
 
 #if OPT_WIDE_CHARS
-    if (screen->wide_chars) {
-	result += (unsigned) screen->lineExtra;
+    if (screen->wide_chars) 
+	{
+	    result += (unsigned) screen->lineExtra;
     }
 #endif
     result *= count;
@@ -286,11 +289,13 @@ allocScrnHead(TScreen * screen, unsigned nrow)
     return result;
 }
 
+
 /*
  * Return the size of a line's data.
  */
+
 static unsigned
-sizeofScrnRow(TScreen * screen, unsigned ncol)
+sizeofScrnRow (TScreen *screen, unsigned ncol )
 {
     unsigned result;
     unsigned sizeAttribs;
@@ -321,6 +326,7 @@ sizeofScrnRow(TScreen * screen, unsigned ncol)
 
     return result;
 }
+
 
 Char *
 allocScrnData(TScreen * screen, unsigned nrow, unsigned ncol)
@@ -1110,12 +1116,13 @@ ScrnAllocBuf(XtermWidget xw)
     return;
 }
 
-size_t
-ScrnPointers(TScreen * screen, size_t len)
-{
-    size_t result = scrnHeadSize(screen, (unsigned) len);
 
-    if (result > screen->save_len) {
+size_t
+ScrnPointers ( TScreen *screen, size_t len )
+{
+    size_t result = scrnHeadSize ( screen, (unsigned) len );
+
+    if (result > screen->save_len){
 	if (screen->save_len)
 	    screen->save_ptr = (ScrnPtr *) realloc(screen->save_ptr, result);
 	else
@@ -1135,7 +1142,7 @@ ScrnPointers(TScreen * screen, size_t len)
  */
 
 void
-ScrnInsertLine(XtermWidget xw, ScrnBuf sb, int last, int where, unsigned n)
+ScrnInsertLine ( XtermWidget xw, ScrnBuf sb, int last, int where, unsigned n)
 {
     TScreen *screen = TScreenOf(xw);
     unsigned size = (unsigned) MaxCols(screen);
@@ -1272,7 +1279,7 @@ ScrnInsertChar ( XtermWidget xw, unsigned n )
     	for (j = last; j >= (col + (int) n); --j) \
 	    data[j] = data[j - (int) n]
 
-    TScreen *screen = TScreenOf(xw);
+    TScreen *screen = TScreenOf (xw);
 	
     int first = ScrnLeftMargin (xw);
     int last = ScrnRightMargin (xw);
@@ -1288,7 +1295,7 @@ ScrnInsertChar ( XtermWidget xw, unsigned n )
 	    TRACE(("ScrnInsertChar - col %d outside [%d..%d]\n", col, first, last));
 	    return;
 		
-    } else if (last <= (col + (int) n)) {
+    } else if ( last <= (col + (int) n) ) {
 		
 	    n = (unsigned) (last - col);
     }
@@ -2322,6 +2329,7 @@ static int
 limitedParseRow(XtermWidget xw, int row)
 {
     TScreen *screen = TScreenOf(xw);
+	
     int min_row = minRectRow(screen);
     int max_row = maxRectRow(screen);
 
@@ -2935,15 +2943,19 @@ probe_netwm(Display * dpy, _Xconst char *propname)
     return has_capability;
 }
 
+
 /*
  * Alter fullscreen mode for the xterm widget, if the window manager supports
  * that feature.
  */
+
 void
 FullScreen(XtermWidget xw, int new_ewmh_mode)
 {
     TScreen *screen = TScreenOf(xw);
+	
     Display *dpy = screen->display;
+	
     _Xconst char *oldprop = ewmhProperty(xw->work.ewmh[0].mode);
     _Xconst char *newprop = ewmhProperty(new_ewmh_mode);
 

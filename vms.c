@@ -26,31 +26,34 @@
 #include "data.h"
 #include "vms.h"
 
-#define PTD$C_SEND_XON		0	/* Pseudo Terminal Driver event      */
-#define PTD$C_SEND_BELL		1
-#define PTD$C_SEND_XOFF 	2
-#define PTD$C_STOP_OUTPUT	3
-#define PTD$C_RESUME_OUTPUT 	4
-#define PTD$C_CHAR_CHANGED 	5
-#define PTD$C_ABORT_OUTPUT 	6
-#define PTD$C_START_READ 	7
-#define PTD$C_MIDDLE_READ 	8
-#define PTD$C_END_READ 		9
+#define PTD$C_SEND_XON		 0	/* Pseudo Terminal Driver event      */
+#define PTD$C_SEND_BELL		 1
+#define PTD$C_SEND_XOFF 	 2
+#define PTD$C_STOP_OUTPUT	 3
+#define PTD$C_RESUME_OUTPUT  4
+#define PTD$C_CHAR_CHANGED 	 5
+#define PTD$C_ABORT_OUTPUT 	 6
+#define PTD$C_START_READ 	 7
+#define PTD$C_MIDDLE_READ 	 8
+#define PTD$C_END_READ 		 9
 #define PTD$C_ENABLE_READ 	10
 #define PTD$C_DISABLE_READ 	11
 #define PTD$C_MAX_EVENTS 	12
 
-#define	BUFFERS		        6
-#define	PAGE			512
+#define	BUFFERS    6
+#define	PAGE	   512
 
-typedef struct	tt_buffer
-{
-unsigned int	flink;
-unsigned int	blink;
-short	int	status;
-short	int	length;
-char		data[VMS_TERM_BUFFER_SIZE];
-} TT_BUF_STRUCT;
+
+typedef struct	tt_buffer {
+	
+    unsigned int flink;
+    unsigned int blink;
+    short int status;
+    short int length;
+    char  data[VMS_TERM_BUFFER_SIZE];
+	
+}TT_BUF_STRUCT;
+
 
 TT_BUF_STRUCT		*tt_w_buff;
 struct	q_head		 _align(QUADWORD)	buffer_queue = (0,0);
@@ -62,6 +65,7 @@ static $DESCRIPTOR   (tt_name_desc, &tt_name);
 static char          ws_name[64];
 static $DESCRIPTOR   (ws_name_desc, &ws_name);
 
+
 static struct        tt_char {
    char        class;
    char        type;
@@ -70,6 +74,7 @@ static struct        tt_char {
    char        length;
    int         extended;
  } tt_mode, tt_chars, orig_tt_chars;
+
 
 struct mem_region
 {
@@ -139,14 +144,16 @@ int trnlnm(char *in, int id, char *out)
   return(++num);         /* return number of translations */
 }
 
-static int           pty;
-static int           Xsocket;
 
-void spawn (void)
-{
-  int                  status;
-  static $DESCRIPTOR   (dtime, "0 00:00:00.01");
-  static int           delta[2];
+    static int pty;
+    static int Xsocket;
+
+void spawn (void){
+	
+    int status;
+	
+    static $DESCRIPTOR   (dtime, "0 00:00:00.01");
+    static int           delta[2];
   register TScreen     *screen = TScreenOf(term);
   static struct IOSB   iosb;
   static unsigned int  flags;
@@ -165,51 +172,56 @@ void spawn (void)
   mbx_chan = 0;
 
   status = SYS$EXPREG (BUFFERS, &ret_addr, 0, 0);
-  if(!(status & SS$_NORMAL)) lib$signal(status);
+	
+  if (!(status & SS$_NORMAL)) lib$signal(status);
 
-  tt_w_buff = (char *)ret_addr.end - PAGE + 1;
+    tt_w_buff = (char *)ret_addr.end - PAGE + 1;
 
-  /* use one buffer for writing, the reset go in the free buffer queue */
-  for(i=0; i < BUFFERS-1; i++)
+    /* use one buffer for writing, the reset go in the free buffer queue */
+    
+	for ( i=0; i < BUFFERS-1; i++ )
     {
-      freeBuff((char *)ret_addr.start +i*PAGE);
+        freeBuff ( (char *) ret_addr.start + i*PAGE );
     }
 
-  /* avoid double MapWindow requests, for wm's that care... */
-  XtSetMappedWhenManaged( screen->TekEmu ? XtParent(tekWidget) :
+    /* avoid double MapWindow requests, for wm's that care... */
+    
+	XtSetMappedWhenManaged ( screen->TekEmu ? XtParent(tekWidget) :
 			 XtParent(term), False );
+	
   /* Realize the Tek or VT widget, depending on which mode we're in.
      If VT mode, this calls VTRealize (the widget's Realize proc) */
-  XtRealizeWidget (screen->TekEmu ? XtParent(tekWidget) :
-		   XtParent(term));
+	
+    XtRealizeWidget (screen->TekEmu ? XtParent(tekWidget) : XtParent(term) );
 
-  /* get the default device characteristics of the pseudo terminal */
+    /* get the default device characteristics of the pseudo terminal */
 
-  itemlist[0].buflen      = 4;
-  itemlist[0].code        = DVI$_DEVTYPE;
-  itemlist[0].buffer      = &type;
-  itemlist[0].return_addr = &tt_name_desc.dsc$w_length;
+    itemlist[0].buflen      = 4;
+    itemlist[0].code        = DVI$_DEVTYPE;
+    itemlist[0].buffer      = &type;
+    itemlist[0].return_addr = &tt_name_desc.dsc$w_length;
 
-  itemlist[1].buflen      = 4;
-  itemlist[1].code        = DVI$_DEVCLASS;
-  itemlist[1].buffer      = &class;
-  itemlist[1].return_addr = &tt_name_desc.dsc$w_length;
+    itemlist[1].buflen      = 4;
+    itemlist[1].code        = DVI$_DEVCLASS;
+    itemlist[1].buffer      = &class;
+    itemlist[1].return_addr = &tt_name_desc.dsc$w_length;
 
-  itemlist[2].buflen      = 4;
-  itemlist[2].code        = DVI$_DEVDEPEND;
-  itemlist[2].buffer      = &devdepend;
-  itemlist[2].return_addr = &tt_name_desc.dsc$w_length;
+    itemlist[2].buflen      = 4;
+    itemlist[2].code        = DVI$_DEVDEPEND;
+    itemlist[2].buffer      = &devdepend;
+    itemlist[2].return_addr = &tt_name_desc.dsc$w_length;
 
-  itemlist[3].buflen      = 4;
-  itemlist[3].code        = DVI$_DEVDEPEND2;
-  itemlist[3].buffer      = &tt_chars.extended;
-  itemlist[3].return_addr = &tt_name_desc.dsc$w_length;
+    itemlist[3].buflen      = 4;
+    itemlist[3].code        = DVI$_DEVDEPEND2;
+    itemlist[3].buffer      = &tt_chars.extended;
+    itemlist[3].return_addr = &tt_name_desc.dsc$w_length;
 
-  itemlist[4].buflen      = 0;
-  itemlist[4].code        = 0;
+    itemlist[4].buflen      = 0;
+    itemlist[4].code        = 0;
 
 
-  status = sys$getdviw(0,0,&device,&itemlist,&iosb,0,0,0);
+  status = sys$getdviw ( 0, 0, &device, &itemlist, &iosb, 0, 0, 0 );
+	
   if(!(status & SS$_NORMAL)) lib$signal(status);
   if(!(iosb.status & SS$_NORMAL)) lib$signal(iosb.status);
 
@@ -323,8 +335,8 @@ void spawn (void)
   if(!(status & SS$_NORMAL)) CloseDown(status);
 
 
-  /* hang a read on the mailbox waiting for completion */
-  mbx_read();
+    /* hang a read on the mailbox waiting for completion */
+    mbx_read ();
 
 
 /* set time value and schedule a periodic wakeup (every 1/100 of a second)
@@ -360,21 +372,21 @@ void spawn (void)
  * on the free buffer queue.
  */
 
-static void tt_echo_ast(TT_BUF_STRUCT *buff_addr)
-{
-  int status;
+static void tt_echo_ast ( TT_BUF_STRUCT *buff_addr ){
+	
+    int status;
 
-  if (buff_addr->length != 0)
+    if ( buff_addr->length != 0 )
     {
-      status = LIB$INSQTI(buff_addr, &read_queue);
-      if((status != SS$_NORMAL) && (status != LIB$_ONEENTQUE))
-	{
-	  CloseDown(status);
-	}
-    }
-  else
-    {
-      freeBuff(buff_addr);
+        status = LIB$INSQTI(buff_addr, &read_queue);
+        
+		if ((status != SS$_NORMAL) && (status != LIB$_ONEENTQUE))
+	    {
+	        CloseDown (status);
+	    }
+		
+    }else{
+        freeBuff (buff_addr);
     }
 }
 
@@ -532,9 +544,10 @@ static void send_xon(void)
 /*
  * If Xoff then stop writing to the pseudo terminal until you get Xon.
  */
-static void send_xoff(void)
+
+static void send_xoff (void)
 {
-  write_stopped = True;
+    write_stopped = True;
 }
 
 
@@ -544,10 +557,11 @@ static void send_xoff(void)
  * of too much data.
  */
 
-static void send_bell(void)
+static void send_bell (void)
 {
-   Bell(term);
+    Bell (term);
 }
+
 
 /*
  * if the pseudo terminal's characteristics change, check to see if the
